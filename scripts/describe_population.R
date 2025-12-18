@@ -24,7 +24,11 @@ options(openalexR.mailto = "collin.schwantes@yale.edu")
 dois <- readr::read_csv("dois/dois.csv")
 
 # get works based on DOIs
-works <- openalexR::oa_fetch(entity = "works",doi = dois$identifier,options = list(select = c("doi","topics","concepts","authorships")))
+works <- openalexR::oa_fetch(entity = "works",doi = dois$identifier,
+                             options = list(select = c("doi","topics",
+                                                       "concepts",
+                                                       "authorships",
+                                                       "primary_location")))
 
 works$original_identifer <- works$doi
 
@@ -59,21 +63,29 @@ works_not_oa_df <- data.frame(identifier = c(
 
 works_updated_oa_id <- openalexR::oa_fetch(entity = "works",
                                      ids.openalex = works_not_oa_df$oa_id,
-                                     options = list(select = c("doi","topics","concepts","authorships")))
+                                     options = list(select = c("doi","topics",
+                                                               "concepts",
+                                                               "authorships",
+                                                               "primary_location")))
 
 
 works_updated_oa_id$original_identifer <- "https://www.ajol.info/index.php/tjs/article/view/171309"
 
+
 works_updated_oa_doi <- openalexR::oa_fetch(entity = "works",
                                            doi = works_not_oa_df$identifier,
-                                           options = list(select = c("doi","topics","concepts","authorships")))
+                                           options = list(select = c("doi",
+                                                                     "topics",
+                                                                     "concepts",
+                                                                     "authorships",
+                                                                     "primary_location")))
 
 ## confusingly, the doi RETURNED from a query is consistently the DOI attribute
 ## see in the JSON file.
 
 works_updated_oa_doi$original_identifer <- works_updated_oa_doi$doi
 
-works_complete <- rbind(works,works_updated_oa_id,works_updated_oa_doi)
+works_complete <- dplyr::bind_rows(works,works_updated_oa_id,works_updated_oa_doi)
 
 
 works_complete$authorship_count <- works_complete$authorships |>
@@ -89,7 +101,7 @@ works_complete |>
   dplyr::filter(doi == original_identifer) 
 
 works_complete_for_publication_table <- works_complete |>
-  dplyr::select(original_identifer,authorship_count)
+  dplyr::select(original_identifer,authorship_count, source_display_name, source_id)
 
 readr::write_csv(works_complete_for_publication_table,"dois/works_with_count.csv")
 
