@@ -23,9 +23,77 @@ options(openalexR.mailto = "collin.schwantes@yale.edu")
 
 dois <- readr::read_csv("dois/dois.csv")
 
-works <- openalexR::oa_fetch(entity = "works",doi = dois$identifier,options = list(select = c("topics,concepts")))
+# get works based on DOIs
+works <- openalexR::oa_fetch(entity = "works",doi = dois$identifier,options = list(select = c("doi","topics","concepts","authorships")))
 
-works <- works|>
+works$original_identifer <- works$doi
+
+
+### look at works not retrieved from open alex
+works_not_oa <- dplyr::anti_join(dois,works,by = c("identifier" = "doi"))
+works_not_oa
+
+## most of these works had mismatching DOIs between the ids object and the DOI field.
+## use DOI in ids OBJECT for better retrieval
+
+## could not find https://ijisr.issr-journals.org/abstract.php?article=IJISR-18-353-04
+works_not_oa_df <- data.frame(identifier = c(
+  "https://doi.org/10.7916/1g9a-gs78",
+  "https://doi.org/10.7916/d8qr4vkm",
+  "https://doi.org/10.5167/uzh-203946",
+  "https://doi.org/10.17863/cam.39009",
+  "https://doi.org/10.7916/d8cz37kr",
+  "https://doi.org/10.5455/javar.2016.c147",
+  "https://doi.org/10.1128/jvi.01059-18",
+  "https://doi.org/10.3929/ethz-b-000493866",
+  "https://doi.org/10.5455/javar.2016.c153",
+  "https://doi.org/10.7916/d8vd8fmd",
+  "https://doi.org/10.5167/uzh-141192",
+  "https://doi.org/10.17863/cam.65556",
+  "https://doi.org/10.7916/d87942n5",
+  "https://doi.org/10.5455/javar.2016.c181"
+  ),
+  oa_id = c("https://openalex.org/W2804947704")
+)
+
+
+works_updated_oa_id <- openalexR::oa_fetch(entity = "works",
+                                     ids.openalex = works_not_oa_df$oa_id,
+                                     options = list(select = c("doi","topics","concepts","authorships")))
+
+
+works_updated_oa_id$original_identifer <- "https://www.ajol.info/index.php/tjs/article/view/171309"
+
+works_updated_oa_doi <- openalexR::oa_fetch(entity = "works",
+                                           doi = works_not_oa_df$identifier,
+                                           options = list(select = c("doi","topics","concepts","authorships")))
+
+## confusingly, the doi RETURNED from a query is consistently the DOI attribute
+## see in the JSON file.
+
+works_updated_oa_doi$original_identifer <- works_updated_oa_doi$doi
+
+works_complete <- rbind(works,works_updated_oa_id,works_updated_oa_doi)
+
+
+works_complete$authorship_count <- works_complete$authorships |>
+  purrr::map_dbl(\(x){
+    nrow(x)
+  })
+
+works_complete |>
+  dplyr::filter(doi == "https://doi.org/10.5455/javar.2016.c147")
+  
+
+works_complete |>
+  dplyr::filter(doi == original_identifer) 
+
+works_complete_for_publication_table <- works_complete |>
+  dplyr::select(original_identifer,authorship_count)
+
+readr::write_csv(works_complete_for_publication_table,"dois/works_with_count.csv")
+
+works_complete <- works_complete|>
   dplyr::mutate(article_id = row_number())
 
 
@@ -80,7 +148,7 @@ topics_df <- data.frame(id = character(), score = numeric(), display_name = char
 
 
 
-topics <- purrr::map2_df(works$topics,works$article_id, function(x,y){
+topics <- purrr::map2_df(works_complete$topics,works_complete$article_id, function(x,y){
     df <- x |>
       dplyr::filter(type == "topic") |>
       dplyr::select(id,score,display_name)
@@ -251,14 +319,19 @@ topics_with_count <- left_join(topics, topic_count,"id") |>
 topics_best_coverage <- c()
 
 ## start with highest and work down the list
+
+## loop over a sorted vector of topics
 for(a in topic_count$id){
   
+  ## check that the topic is in the dataframe with articles
   if(a %in% topics_with_count$id){
+    
+    # give me all the articles associated with that topic
     topic_articles <- topics_with_count |>
       dplyr::filter(id == a)|>
       pull(article_id)
     
-    # drop those articles from topics
+    # drop those articles from the dataframe with articles
     topics_with_count <- topics_with_count |>
       dplyr::filter(!article_id %in% topic_articles)
     
@@ -398,10 +471,29 @@ find_best_coverage <- function( topics = topics, iterations = 1000, jitter_start
   return(out)
 }
 coverage_out <- find_best_coverage(topics = topics,iterations = 10000, jitter_start = 40)
-coverage_out
-
-
+coverage_out[1,"ids"][[1]][[1]]
 
 ### pull OA records for papers with those topics
 
+works_topic <- openalexR::oa_fetch(entity = "works",
+                                   topics.id = coverage_out[1,"ids"][[1]][[1]],
+                                   from_publication_date = "2011-01-01",
+                                   to_publication_date = "2022-12-31",
+                                   options = list(
+                                     select = c("authorships",
+                                                "doi",
+                                                "primary_location",
+                                                "title"
+                                     )
+                                   ),
+                                   output = "list"
+                                   )
+
+
+saveRDS(works_topic,file = "data/works_topic_list.rds")
+
 ### look at total number of unique authors in those works
+
+
+
+### 
