@@ -1,6 +1,8 @@
 source("packages.R")
 
+
 # load authorship data
+targets::tar_make(auths_with_gender)
 targets::tar_load(auths_with_gender)
 
 # create summary table
