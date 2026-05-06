@@ -52,19 +52,29 @@ data_processing_targets <- tar_plan(
   contributor_data_intermed = clean_contributor_data(contributor_data_raw),
   auths_with_gender = add_gender_to_auths(contributor_data_intermed, 
                                           authorship_data),
-
-  contrib_keep = unique(auths_with_gender$contributor_id),
-
-  contributor_data = contributor_data_intermed %>%
-    filter(contributor_id %in% contrib_keep),
+  
+  tar_target(contrib_keep, 
+             unique(auths_with_gender$contributor_id)
+             ),
+  
+  tar_target(contributor_data, 
+              filter_contributor_data(contributor_data_intermed,contrib_keep)
+                ),
+  
   publication_data = clean_publication_data(publication_data_raw),
 
   # geographic comparison of publication focus vs authorship affiliations
-  pubs_with_focal_country = compare_geography(publication_data,
-                                              authorship_data),
+  tar_target(pubs_with_focal_country,
+             compare_geography(publication_data, 
+                               auths_with_gender), 
+             ),
 
-  model_dat = prep_model_dat(auths_with_gender)
-  
+  tar_target(model_dat,
+             prep_model_dat(auths_with_gender)
+             ),
+  tar_target(glm_dat,
+             prep_glm_dat(auths_with_gender)
+  )
 )
 
 
@@ -73,43 +83,71 @@ analysis_targets <- tar_plan(
   
   ## Gender by authorship position breakdown ----
   tar_target(gender_position_summary, 
-             summarize_gender_by_position(auths_with_gender)),
+             summarize_gender_by_position(auths_with_gender)
+             ),
   
   ## Geographic breakdown ----
   tar_target(authorship_country_summary,
-             summarize_by_country(authorship_data, income_data_clean)),
+             summarize_by_country(auths_with_gender, income_data_clean)
+             ),
 
   ## Gender by country breakdown ----
   tar_target(gender_country_summary,
-             summarize_gender_by_country(auths_with_gender, income_data_clean)),
+             summarize_gender_by_country(auths_with_gender, income_data_clean)
+             ),
 
   ## income by authorship position breakdown ----
   tar_target(income_position_summary,
-             summarize_income_by_position(auths_with_gender)),
+             summarize_income_by_position(auths_with_gender)
+             ),
 
   ## Gender over time by income ----
   tar_target(gender_income_time_summary,
-             summarize_gender_income_over_time(auths_with_gender)),
+             summarize_gender_income_over_time(auths_with_gender)
+             ),
 
   ## Gender over time by authorship position ----
   tar_target(gender_position_time_summary,
-             summarize_gender_position_over_time(auths_with_gender)),
+             summarize_gender_position_over_time(auths_with_gender),
+             ),
 
   ## Authorships by contributor and gender ----
   tar_target(authorships_contributor_gender_summary,
-             summarize_authorships_contributor_gender(auths_with_gender)),
+             summarize_authorships_contributor_gender(auths_with_gender)
+             ),
   
   # look at last authorships within highly productive authors
   tar_target(prolific_summary,
-             examine_prolific(auths_with_gender, prolific_cutoff = 10)),
+             examine_prolific(auths_with_gender, prolific_cutoff = 10)
+             ),
 
   ## Authorships by gender, position, income ----
   tar_target(gender_position_income_summary,
-             summarize_gender_position_income(auths_with_gender)),
+             summarize_gender_position_income(auths_with_gender)
+             ),
+  
+
+  # outliers are not measurement errors but part of the actual distributions
+  # and critical to the processes that shape publication patterns
+  #
+  # we would like to compare the distributions of authorships by gender
+  # to know if gender impacts publication rate (pubs/1 year)
+  # observations are not paired 
+
+  tar_target(pub_rate_mod,
+             compare_distributions(glm_dat)
+            ),
+  
+  # pubs/11 years
+  tar_target(pub_rate_mod_full_obs_period,
+             compare_distributions(authorships_contributor_gender_summary)
+            ),
   
   # run model
-  mod = lm(perc_female ~ year_centered*authorship_position + 
-              authorship_position*income_majority, data = model_dat)
+  tar_target(mod,  
+             lm(perc_female ~ year_centered*authorship_position + 
+                  authorship_position*income_majority, data = model_dat)
+             )
   
 )
 
@@ -120,44 +158,67 @@ outputs_targets <- tar_plan(
   ## Authorships by contributor and gender (FIG 1)
   tar_target(authorships_histogram,
              plot_authorships_contributor_gender(
-               authorships_contributor_gender_summary, gender_colors)),
+               authorships_contributor_gender_summary, gender_colors)
+  ),
+    tar_target(authorships_histogram_glm,
+             plot_authorships_contributor_gender_glm(
+               authorships_contributor_gender_summary,pub_rate_mod_full_obs_period, gender_colors)
+             ),
+  
+  ## Authorships by contributor and gender PER YEAR (FIG X) ? maybe in supplemental
+  tar_target(authorships_per_year_histogram_glm,
+             plot_authorships_contributor_gender_glm(
+               glm_dat, pub_rate_mod, gender_colors)
+             ),
 
   ## Authorships by gender, position, income (FIG 2)
   tar_target(gender_position_income_plot,
              plot_gender_position_income(gender_position_income_summary,
-                                       gender_colors)),
+                                       gender_colors)
+             ),
   
+  # model diagnostic plots - returns a file path
+  tar_target(model_diagnostic_plots,
+             plot_model_diagnostics(mod)
+  ),
 
   tar_target(propfem_position_time_plot,
              plot_propfem_position_over_time(gender_position_time_summary, 
-                                             position_colors)),
+                                             position_colors),
+             ),
   tar_target(model_preds_plot,
-             plot_model_preds(mod, income_colors, gender_colors)),
+             plot_model_preds(mod, income_colors, gender_colors),
+             ),
   
   # proportion female over time by position, and model preds (FIG 3)
   tar_target(propfem_two_panel,
              plot_two_panel(propfem_position_time_plot, model_preds_plot, 
                             ncols = 2, nrows = 1, 
-                            alignment = "h", align_axis = "hv")),
+                            alignment = "h", align_axis = "hv"),
+             ),
     
     
   ## gender/position plots (FIG S1)
   tar_target(gender_position_plot,
-             plot_gender_by_position(gender_position_summary, gender_colors)),
+             plot_gender_by_position(gender_position_summary, gender_colors)
+             ),
   
   ## geographic plots (FIG S2)
   tar_target(country_income_plot,
              plot_by_country(authorship_country_summary,
                              variable = "country.name.en",
-                             income_colors)),
+                             income_colors)
+             ),
   
   ## gender by country plot (FIG S3)
   tar_target(gender_country_plot,
-             plot_gender_by_country(gender_country_summary, gender_colors)),
+             plot_gender_by_country(gender_country_summary, gender_colors),
+             ),
   
   ## income by authorship position plot (FIG S4)
   tar_target(income_position_plot,
-             plot_income_by_position(income_position_summary, income_colors))
+             plot_income_by_position(income_position_summary, income_colors),
+             )
   
 )
 

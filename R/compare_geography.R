@@ -22,7 +22,7 @@ pubs_with_focal_country$either_geo_match <- NA
 
 # for a given publication:
 for(i in pubs_with_focal_country$identifier){
-  
+
   # get the country code of first author
   first_auth_cc <- authorship_data %>% 
     filter(publication_link == i,
@@ -47,6 +47,11 @@ for(i in pubs_with_focal_country$identifier){
   # test if first author cc matches with any of the focal countries 
   first_match <- str_detect(string = paper_cc, pattern = first_auth_cc)
   # store the result
+  ## first author may be filtered from results...
+  if(rlang::is_empty(first_auth_cc)){
+    first_match <- NA
+  }
+  
   pubs_with_focal_country$first_geo_match[pubs_with_focal_country$identifier == i] <- first_match
   
   # was there a last author?

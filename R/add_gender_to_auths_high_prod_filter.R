@@ -6,7 +6,9 @@
 #' @return
 #' @author Cecilia Sanchez
 #' @export
-add_gender_to_auths <- function(contributor_data, authorship_data){
+add_gender_to_auths <- function(contributor_data, 
+                                authorship_data,
+                                auth_count = 10){
   
   # join gender data and country economic development data to authorship data
   auths_with_gender <- authorship_data %>% 
@@ -21,7 +23,10 @@ add_gender_to_auths <- function(contributor_data, authorship_data){
     mutate(gender_final = as.factor(gender_final))
   
   
+  auths_with_gender_no_high_prod <- drop_hp_auths(auths_with_gender,auth_count)
   
-  return(auths_with_gender)
+  out <- list(auths_with_gender, auths_with_gender_no_high_prod)
+  
+  return(out)
   
 }
