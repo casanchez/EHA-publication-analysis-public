@@ -138,8 +138,9 @@ analysis_targets <- tar_plan(
              compare_distributions(glm_dat)
             ),
   
+  # pubs/11 years
   tar_target(pub_rate_mod_full_obs_period,
-             compare_distributions(glm_dat)
+             compare_distributions(authorships_contributor_gender_summary)
             ),
   
   # run model
@@ -167,9 +168,8 @@ outputs_targets <- tar_plan(
   ## Authorships by contributor and gender PER YEAR (FIG X) ? maybe in supplemental
   tar_target(authorships_per_year_histogram_glm,
              plot_authorships_contributor_gender_glm(
-               glm_dat, pub_rate_mod, gender_colors),
-             pattern = map(glm_dat,pub_rate_mod),
-             iteration = "list"),
+               glm_dat, pub_rate_mod, gender_colors)
+             ),
 
   ## Authorships by gender, position, income (FIG 2)
   tar_target(gender_position_income_plot,
