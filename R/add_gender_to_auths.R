@@ -21,10 +21,7 @@ add_gender_to_auths <- function(contributor_data, authorship_data){
     mutate(gender_final = as.factor(gender_final))
   
   
-  auths_with_gender_9 <- drop_hp_auths(auths_with_gender)
   
-  out <- list(auths_with_gender, auths_with_gender_9)
-  
-  return(out)
+  return(auths_with_gender)
   
 }
