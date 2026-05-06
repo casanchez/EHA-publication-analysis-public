@@ -16,14 +16,40 @@ knitr::opts_chunk$set(
 
 This repo contains code to generate results and figures for the "Gendered male and high-income country authors dominate publication at a One Health research organization" paper. 
 
-This repo uses renv for dependency management. Run `renv::restore` to install
-all packages from their recorded versions. 
+To run this code base, you must have [R](https://www.r-project.org/) and [python](https://www.python.org/) installed on your computer. The code is primarily
+written in R but does depend a python library.
 
-To recreate the results and figures used in the paper, run `targets::tar_make(main_text)`. Please note that items in the rmd may not reflect the plos submission guidance for size or other aesthetic features.
+To reproduce the results, first clone or download this github repository to your computer.
+
+This repo uses [renv](https://rstudio.github.io/renv/articles/renv.html) for 
+dependency management. Run `renv::restore` to install all packages from their
+recorded versions. Renv should handle creating virtual python environments and installing python libraries as well. 
+
+This repo uses [targets](https://books.ropensci.org/targets/) to orchestrate the analysis pipeline. To recreate the results and figures used in the paper, run `targets::tar_make(main_text)`. This will render the rmarkdown notebook found at `reports/main_text.Rmd`. The actual pipeline is contained in  `_targets.R` and `_network_analysis_targets.R`.
+
+* Please note that items in the rmd may not reflect the plos submission guidance for size or other aesthetic features. 
+
 
 Data used for analysis can be found in the following zenodo deposit: 
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15226626.svg)](https://doi.org/10.5281/zenodo.15226626)
+
+
+Repo structure overview:
+
+```
+├── R = folder that contains functions used in the targets pipeline
+├── _network_analysis_targets.R = targets used in network analysis. Sourced in _targets.R
+├── _targets = folder containing targets pipeline artifacts
+├── _targets.R = main targets pipeline file
+├── data = local storage location for data
+├── figures = storage location for figures
+├── packages.R = R script that lists all R packages used in the analysis
+├── renv = storage location for renv artifacts
+├── renv.lock = file that describes package versions and other software dependencies for this project. 
+├── reports = storage location for rmarkdown documents and rendered html documents
+└── scripts = storage location for R files used to perform one time transformations on data.
+```
 
 
 
