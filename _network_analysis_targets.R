@@ -8,38 +8,54 @@ network_targets <- tarchetypes::tar_plan(
                              nqg_classification,
                              institution_display_name,
                              institution_country_code) %>% 
-               dplyr::mutate(contributor_id = as.character(contributor_id))
+               dplyr::mutate(contributor_id = as.character(contributor_id)),
+                             pattern = map(contributor_data)
   ),
   
   # get primary affiliations
-  tar_target(primary_affiliation, get_primary_affiliations(contrib_reduced)),
-  tar_target(df_contrib, get_primary_country(primary_affiliation)),
+  tar_target(primary_affiliation, get_primary_affiliations(contrib_reduced),
+             pattern = map(contrib_reduced)),
+  tar_target(df_contrib, get_primary_country(primary_affiliation),
+             pattern = map(primary_affiliation)),
   
   # reduce authorship dataframe
-  tar_target(df_auth, authorship_data %>% 
+  tar_target(df_auth, auths_with_gender[[1]] %>% 
                dplyr::select(all_of(c("contributor_id", "publication"))) %>% 
                dplyr::mutate(contributor_id = as.character(contributor_id)) %>% 
-               dplyr::filter(!is.na(contributor_id))
+               dplyr::filter(!is.na(contributor_id)),
+             pattern = map(auths_with_gender)
   ),
   
   # make graph object ####
-  tar_target(g_contrib_gender, make_graph_object(df_auth,df_contrib)),
+  tar_target(g_contrib_gender, make_graph_object(df_auth,df_contrib),
+             pattern = map(df_auth,df_contrib),
+             iteration = "list"),
   
   # basic graph attributes ####
   
   ## degree distribution 
-  degree_distribution = plot(igraph::degree_distribution(g_contrib_gender)),
-  
+  tar_target(degree_distribution_plot,
+             plot_degree_distribution(g_contrib_gender),
+             pattern = map(g_contrib_gender),
+             iteration = "list"
+             ),
+ 
   # most people (80%) are publishing as first or last author with exactly 1 other person"
   
   tar_target(highly_connected_individuals, 
-             get_highly_connected_individuals(g_contrib_gender)),
+             get_highly_connected_individuals(g_contrib_gender),
+             pattern = map(g_contrib_gender),
+             iteration = "list"
+             ),
   
   # 87/498  contributors are publishing first or last author papers with 2 or more other contributors"
   
   ### How centralized is the graph based on a measure of degree - range 0-1 where
   ## 0 is maximally decentralized 1 is fully centralized
-  degree_centrality = igraph::centr_degree(g_contrib_gender),
+  tar_target(degree_centrality,
+             igraph::centr_degree(g_contrib_gender),
+             pattern = map(g_contrib_gender)
+             ),
   
   # 0.065 is highly decentralized based on degree measures of centrality"
   

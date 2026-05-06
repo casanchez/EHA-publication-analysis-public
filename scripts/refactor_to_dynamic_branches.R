@@ -58,3 +58,21 @@ tar_read(gender_position_plot, branches = 2)
 
 tar_make(country_income_plot)
 tar_read(country_income_plot, branches = 1)
+
+tar_make(contrib_reduced)
+tar_make(g_contrib_gender)
+tar_load(g_contrib_gender)
+
+igraph::degree_distribution(g_contrib_gender[[2]]) |>
+  plot()
+
+
+tar_make(degree_distribution_plot)
+tar_read(degree_distribution_plot,branches = 1)
+
+
+tar_make(highly_connected_individuals)
+tar_read(highly_connected_individuals)
+
+tar_make(degree_centrality)
+tar_read(degree_centrality)         

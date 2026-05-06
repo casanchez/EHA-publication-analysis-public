@@ -51,7 +51,8 @@ data_processing_targets <- tar_plan(
   authorship_data = clean_authorship_data(authorship_data_raw, income_data_clean),
   contributor_data_intermed = clean_contributor_data(contributor_data_raw),
   auths_with_gender = add_gender_to_auths(contributor_data_intermed, 
-                                          authorship_data),
+                                          authorship_data,
+                                          auth_count = 2),
   
   tar_target(contrib_keep, 
              unique(auths_with_gender[[1]]$contributor_id),
@@ -76,7 +77,11 @@ data_processing_targets <- tar_plan(
   tar_target(model_dat,
              prep_model_dat(auths_with_gender[[1]]),
              pattern = map(auths_with_gender)
-             )
+             ),
+  tar_target(glm_dat,
+             prep_glm_dat(auths_with_gender[[1]]),
+             pattern = map(auths_with_gender)
+  )
 )
 
 
@@ -130,12 +135,29 @@ analysis_targets <- tar_plan(
              summarize_gender_position_income(auths_with_gender[[1]]),
              pattern = map(auths_with_gender)),
   
+
+  # outliers are not measurement errors but part of the actual distributions
+  # and critical to the processes that shape publication patterns
+  #
+  # we would like to compare the distributions of authorships by gender
+  # to know if gender impacts publication rate (pubs/1 year)
+  # observations are not paired 
+
+  tar_target(pub_rate_mod,
+             compare_distributions(glm_dat),
+             pattern = map(glm_dat)
+            ),
+  
+  tar_target(pub_rate_mod_full_obs_period,
+             compare_distributions(glm_dat),
+             pattern = map(authorships_contributor_gender_summary)
+  ),
+  
   # run model
   tar_target(mod, 
              lm(perc_female ~ year_centered*authorship_position + 
                   authorship_position*income_majority, data = model_dat),
              pattern = map(model_dat))
-
   
 )
 
@@ -145,9 +167,16 @@ outputs_targets <- tar_plan(
 
   ## Authorships by contributor and gender (FIG 1)
   tar_target(authorships_histogram,
-             plot_authorships_contributor_gender(
-               authorships_contributor_gender_summary, gender_colors),
-              pattern = map(authorships_contributor_gender_summary),
+             plot_authorships_contributor_gender_glm(
+               authorships_contributor_gender_summary,pub_rate_mod_full_obs_period, gender_colors),
+              pattern = map(authorships_contributor_gender_summary,pub_rate_mod_full_obs_period),
+             iteration = "list"),
+  
+  ## Authorships by contributor and gender PER YEAR (FIG X) ? maybe in supplemental
+  tar_target(authorships_per_year_histogram,
+             plot_authorships_contributor_gender_glm(
+               glm_dat, pub_rate_mod, gender_colors),
+             pattern = map(glm_dat,pub_rate_mod),
              iteration = "list"),
 
   ## Authorships by gender, position, income (FIG 2)
@@ -157,6 +186,12 @@ outputs_targets <- tar_plan(
              pattern = map(gender_position_income_summary),
              iteration = "list"),
   
+  # model diagnostic plots - returns a file path
+  tar_target(model_diagnostic_plots,
+             plot_model_diagnostics(mod),
+             pattern = map(mod),
+             iteration = "list"
+  ),
 
   tar_target(propfem_position_time_plot,
              plot_propfem_position_over_time(gender_position_time_summary, 

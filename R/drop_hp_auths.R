@@ -1,9 +1,9 @@
-drop_hp_auths <- function(auths_with_gender){
+drop_hp_auths <- function(auths_with_gender, auth_count = 10){
   
   contrib_ids_9 <- auths_with_gender |>
     dplyr::group_by(contributor_id) |>
     dplyr::summarise(n = dplyr::n()) |>
-    dplyr::filter(n < 10) |>
+    dplyr::filter(n < auth_count) |>
     dplyr::ungroup() |>
     dplyr::select(contributor_id)
   
