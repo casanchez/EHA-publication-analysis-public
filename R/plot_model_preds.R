@@ -34,7 +34,7 @@ plot_model_preds <- function(mod, income_colors, gender_colors, mod_terms = c("i
                    inherit.aes = FALSE,
                    data = ggpredict_df ) +
     theme_bw() +
-    ylim(c(0, 75)) +
+    ylim(c(0, 100)) +
     labs(alpha = "Authorship position") +
     xlab("Country Income") +
     ylab("Predicted percent of authorships \nby gendered female authors") +
