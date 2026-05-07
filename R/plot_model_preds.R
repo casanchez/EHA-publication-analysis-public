@@ -21,7 +21,7 @@ plot_model_preds <- function(mod, income_colors, gender_colors, mod_terms = c("i
                    alpha = group),
                size = 3,
                color = gender_colors[1],
-               position = position_dodge(width = .5)) +
+               position = position_dodge(width = .25)) +
     # scale_color_manual(values = gender_colors[c(1,1)]) +
     scale_alpha_manual(values = c(0.4, 1)) + 
     geom_linerange(aes(x = x,
@@ -39,7 +39,7 @@ plot_model_preds <- function(mod, income_colors, gender_colors, mod_terms = c("i
     xlab("Country Income") +
     ylab("Predicted percent of authorships \nby gendered female authors") +
     scale_x_discrete(position = "bottom", 
-                     expand = c(.25,.25),
+                     expand = c(.37,.37),
                      labels = c('Low and Middle Income', 'High Income')) +
        theme(legend.position = "inside",
           legend.position.inside = c(0.5, 0.8),
