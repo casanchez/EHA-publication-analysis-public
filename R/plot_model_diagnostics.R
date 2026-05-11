@@ -7,7 +7,7 @@
 #' @return
 #' @author collinschwantes
 #' @export
-plot_model_diagnostics <- function(mod, dp_file = "diagnostic_plots.png") {
+plot_model_diagnostics <- function(mod, dp_file = "figures/diagnostic_plots.png") {
 
   # Define the output file
   png(dp_file, width = 800, height = 800)
@@ -19,5 +19,5 @@ plot_model_diagnostics <- function(mod, dp_file = "diagnostic_plots.png") {
   # 4. Close the device
   dev.off()
 
-  return(file_time)
+  return(dp_file)
 }

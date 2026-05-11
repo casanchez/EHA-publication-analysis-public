@@ -1,14 +1,14 @@
 #' join contributor data to authorship data
 #'
-#' @title add_gender_to_auths
+#' @title add_gender_to_auths_high_prod_filter
 #' @param contributor_data contains gender data for unique contributors
 #' @param authorship_data
 #' @return
 #' @author Cecilia Sanchez
 #' @export
-add_gender_to_auths <- function(contributor_data, 
-                                authorship_data,
-                                auth_count = 10){
+add_gender_to_auths_high_prod_filter <- function(contributor_data, 
+                                                 authorship_data,
+                                                 auth_count = 10){
   
   # join gender data and country economic development data to authorship data
   auths_with_gender <- authorship_data %>% 
