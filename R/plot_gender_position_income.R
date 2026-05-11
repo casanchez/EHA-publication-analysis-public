@@ -28,8 +28,8 @@ plot_gender_position_income <- function(gender_position_income_summary,
                                  "Gendered nonbinary", "Unknown"),
                       values = gender_colors,
                       guide = "none") +
-    scale_alpha_manual(name = "Authorship position",
-                       labels = c("First", "Last"),
+    scale_alpha_manual(name = "",
+                       labels = c("First authorship", "Last authorship"),
                        values = c(0.4, 1)) +
     facet_wrap(~income_majority, nrow = 2) +
     ylab("Percent of all first and last authorships") +

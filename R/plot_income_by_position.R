@@ -20,8 +20,8 @@ plot_income_by_position <- function(income_position_summary, income_colors){
              fill = income_majority,
              alpha = authorship_position)) +
     geom_col(position = position_dodge()) +
-    scale_alpha_manual(name = "Authorship position",
-                       labels = c("First", "Last"),
+    scale_alpha_manual(name = "",
+                       labels = c("First authorship", "Last authorship"),
                        values = c(0.4, 1)) +
     scale_fill_manual(name = "",
                       values = income_colors,
@@ -30,6 +30,7 @@ plot_income_by_position <- function(income_position_summary, income_colors){
     theme_bw() +
     theme(legend.position = "bottom",
           legend.box = "vertical",
+          legend.title = element_blank(),
           legend.text = element_text(color = "black", size = 12),
           axis.text = element_text(color = "black", size = 12),
           axis.title = element_text(color = "black", size = 14)

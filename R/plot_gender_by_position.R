@@ -19,13 +19,14 @@ plot_gender_by_position <- function(gender_position_summary, gender_colors){
                                  "Gendered nonbinary", "Unknown"),
                       values = gender_colors,
                       guide = "none") +
-    scale_alpha_manual(name = "Authorship position",
-                       labels = c("First", "Last"),
+    scale_alpha_manual(name = "",
+                       labels = c("First authorship", "Last authorship"),
                        values = c(0.4, 1)) +
     ylab("Percent of all first and last authorships") + xlab("") +
     theme_bw() +
     theme(legend.position = "bottom",
           legend.box = "vertical",
+          legend.title = element_blank(),
           legend.text = element_text(color = "black", size = 12),
           axis.text = element_text(color = "black", size = 12),
           axis.title = element_text(color = "black", size = 14)

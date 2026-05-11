@@ -23,14 +23,14 @@ plot_propfem_position_over_time <- function(gender_position_time_summary,
                color = "black") +
     geom_line(aes(color = authorship_position)) +
     scale_color_manual(name = "", values = position_colors, 
-                       labels = c("First", "Last")) +
+                       labels = c("First authorship", "Last authorship")) +
     scale_fill_manual(name = "", values = position_colors, 
-                      labels = c("First", "Last")) +
+                      labels = c("First authorship", "Last authorship")) +
     ylab("Percent of authorships \nby gendered female authors") + xlab("") +
     ylim(c(0, 100)) +
     theme_bw() +
     theme(legend.position = "inside",
-          legend.position.inside = c(0.25, 0.8),
+          legend.position.inside = c(0.35, 0.8),
           legend.title = element_blank(),
           legend.text = element_text(color = "black", size = 8),
           axis.text = element_text(color = "black", size = 8),
