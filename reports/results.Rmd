@@ -37,6 +37,8 @@ tar_load(gender_position_plot) # Fig S1
 tar_load(country_income_plot) # Fig S2
 tar_load(gender_country_plot) # Fig S3
 tar_load(income_position_plot) # Fig S4
+
+tar_load(prolific_summary) # Table S2
 ```
 
 ```{r dataset summary, include = F}
@@ -53,7 +55,7 @@ n_contrib <- nrow(contributor_data)
 
 ##### *Dataset summary*
 
-Restricting the EHA research outputs catalog to only include peer-reviewed journal articles published from January 1, 2011 through December 31, 2022 resulted in a corpus of `r n_pub` articles. We identified `r n_auth` first and last authorships (FLA) associated with those articles, which were linked to `r n_contrib` unique authors.
+Filtering the EHA research outputs catalog to peer-reviewed journal articles published from January 1, 2011 to December 31, 2022 resulted in a corpus of `r n_pub` articles. We identified `r n_auth` FLAs associated with those `r n_pub` articles, which were linked to `r n_contrib` unique authors.
 
 <br>
 
@@ -103,9 +105,9 @@ mm2 <- comparison_table[2,1]
 # xtabs(~gender_based_on_pronouns + gender_based_on_nqg, gender_matches)
 ```
 
-##### *Comparison of two approaches to classify author gender*
+##### *Comparison of two approaches to classify author gender* (TEXT S2)
 
-Using the pronouns-based approach, we classified `r gender_by_pronouns[2,2]` authors (`r gender_by_pronouns[2,3]`%) as gendered male, `r gender_by_pronouns[1,2]` (`r gender_by_pronouns[1,3]`%) as gendered female, and `r gender_by_pronouns[3,2]` (`r gender_by_pronouns[3,3]`%) as nonbinary. We were unable to find pronoun data for `r gender_by_pronouns[4,2]` authors (`r gender_by_pronouns[4,3]`%). Of the `r n_with_pronouns` authors for whom we were able to find pronouns, publicly available online information was the source for `r pronoun_sources[1]` (`r pronoun_sources_perc[1]`%), while professional interactions were the source for the remaining `r pronoun_sources[2]` (`r pronoun_sources_perc[2]`%). Using the name-based approach, we classified `r gender_by_nqg[2,2]` authors (`r gender_by_nqg[2,3]`%) as gendered male, `r gender_by_nqg[1,2]` (`r gender_by_nqg[1,3]`%) as gendered female, `r gender_by_nqg[3,2]` (`r gender_by_nqg[3,3]`%) as uncertain, and `r gender_by_nqg[4,2]` (`r gender_by_nqg[4,3]`%) as undetermined. Agreement between the two gender classification approaches was generally high (**Table S1**). However, there were `r mm1` cases where an author was gendered female or nonbinary based on pronouns but gendered male based on name, and `r mm2` cases where an author was gendered male based on pronouns but gendered female based on name.
+Using the pronouns-based approach, we classified `r gender_by_pronouns[2,2]` authors (`r gender_by_pronouns[2,3]`%) as gendered male, `r gender_by_pronouns[1,2]` (`r gender_by_pronouns[1,3]`%) as gendered female, and `r gender_by_pronouns[3,2]` (`r gender_by_pronouns[3,3]`%) as gendered nonbinary. We were unable to find pronouns for `r gender_by_pronouns[4,2]` authors (`r gender_by_pronouns[4,3]`%). Of the `r n_with_pronouns` authors whose pronouns were identified, publicly available online information was the source for `r pronoun_sources[1]` (`r pronoun_sources_perc[1]`%), while professional interactions were the source for the remaining `r pronoun_sources[2]` (`r pronoun_sources_perc[2]`%). Using the name-based approach, we classified `r gender_by_nqg[2,2]` authors (`r gender_by_nqg[2,3]`%) as gendered male, `r gender_by_nqg[1,2]` (`r gender_by_nqg[1,3]`%) as gendered female, `r gender_by_nqg[3,2]` (`r gender_by_nqg[3,3]`%) as uncertain, and `r gender_by_nqg[4,2]` (`r gender_by_nqg[4,3]`%) as undetermined. Agreement between the two gender classification approaches was generally high (**Table S1**). There were `r mm1` cases where an author was gendered female or gendered nonbinary based on pronouns but gendered male based on name, and `r mm2` cases where an author was gendered male based on pronouns but gendered female based on name.
 
 <br>
 
@@ -129,7 +131,7 @@ gender_auths_table <- auths_with_gender %>%
                    perc = round(perc, 1))
 
 # authorship position by gender
-# % of first and last authors within all FLA
+# % of first and last authors within all FLAs
 perc_all <- gender_position_summary %>% 
   group_by(authorship_position, gender_final) %>% 
   dplyr::summarize(n = sum(n)) %>% 
@@ -187,16 +189,11 @@ auths_by_prolif_male <- prolif_male %>%
   dplyr::summarise(tot = sum(n),
                    perc = tot/n_auth*100,
                    perc = round(perc, 1))
+
+# last authorships as percent of FLAs for prolific authors
+last_auth_65 <- nrow(prolific_summary %>% dplyr::filter(perc_last_auth > 65))
   
 ```
-
-##### *Gender composition of authors and authorships*
-
-After combining the results of our two gender classification approaches, prioritizing gender based on pronouns in cases of disagreement, we ultimately classified `r gender_by_final[2,2]` authors (`r gender_by_final[2,3]`%) as gendered male, `r gender_by_final[1,2]` (`r gender_by_final[1,3]`%) as gendered female, `r gender_by_final[3,2]` (`r gender_by_final[3,3]`%) as nonbinary, and `r gender_by_final[4,2]` (`r gender_by_final[4,3]`%) as unknown gender. Of all FLA, `r gender_auths_table[2,2]` (`r gender_auths_table[2,3]`%) were by gendered male authors, `r gender_auths_table[1,2]` (`r gender_auths_table[1,3]`%) were by gendered female authors, `r gender_auths_table[3,2]` (`r gender_auths_table[3,3]`%) was by a nonbinary author, and `r gender_auths_table[4,2]` (`r gender_auths_table[4,3]`%) were by authors of unknown gender.
-
-For both the first and last author positions, there were more authorships by gendered male authors than by gendered female authors (first-male: `r perc_all[2,4]`% of all FLA, first-female: `r perc_all[1,4]`%, last-male: `r perc_all[6,4]`%, last-female: `r perc_all[5,4]`%; **Fig. S1**). Nearly three-quarters of all authors (`r one_auth_all`%) had one authorship each (`r one_auth_males` gendered male authors and `r one_auth_females` gendered female authors) (**Fig. 1**). There was only `r n_prolif_female` gendered female author with ≥ `r prolif_cutoff` total FLA, while there were `r n_prolif_male` gendered male authors with `r prolif_cutoff` - `r max_auths` total FLA each. Collectively, those `r n_prolif_male` gendered male authors accounted for `r auths_by_prolif_male[1,1]` (`r auths_by_prolif_male[1,2]`%) of all FLA in the corpus (**Fig. 1**).
-
-<br>
 
 ```{r Geographic patterns in authorships, include = F}
 
@@ -242,7 +239,7 @@ position_by_income <- round(xtabs(~authorship_position + income_majority,
                                  auths_with_gender)/n_auth*100, 1)
 
 
-# gender and income within all FLA
+# gender and income within all FLAs
 gender_country_summary %>%
   group_by(income_majority, gender_final) %>%
   dplyr::summarise(n = sum(n)) %>%
@@ -253,9 +250,17 @@ china_summary <- gender_country_summary %>%
   filter(country_name == "China")
 ```
 
+##### *Gender composition of authors and authorships*
+
+After combining the results of our two gender classification approaches (see Text S2 and Table S1 for a comparison of the approaches), prioritizing gender inferred using pronouns in cases of dataset disagreement, we ultimately classified `r gender_by_final[2,2]` authors (`r gender_by_final[2,3]`%) as gendered male, `r gender_by_final[1,2]` (`r gender_by_final[1,3]`%) as gendered female, `r gender_by_final[3,2]` (`r gender_by_final[3,3]`%) as gendered nonbinary, and `r gender_by_final[4,2]` (`r gender_by_final[4,3]`%) as unknown gender. Of all FLAs, `r gender_auths_table[2,2]` (`r gender_auths_table[2,3]`%) were by gendered male authors, `r gender_auths_table[1,2]` (`r gender_auths_table[1,3]`%) were by gendered female authors, `r gender_auths_table[3,2]` (`r gender_auths_table[3,3]`%) was by a gendered nonbinary author, and `r gender_auths_table[4,2]` (`r gender_auths_table[4,3]`%) were by authors of unknown gender. Our gender classification process was least successful for authorships listing an affiliation with China, with `r china_summary[3,4]` out of `r country_tots[4,2]` authorships classified as unknown gender. Given that only one author was classified as gendered nonbinary, we included that author in figures (except where noted) but did not attempt to draw any conclusions about authorship patterns in regard to nonbinary authors.
+
+For both the first and last author positions, there were more authorships by gendered male authors than by gendered female authors (first-male: `r perc_all[2,4]`% of all FLAs, first-female: `r perc_all[1,4]`%, last-male: `r perc_all[6,4]`%, last-female: `r perc_all[5,4]`%; **Fig. S1**). Nearly three-quarters of all authors (`r one_auth_all`%) had one authorship each (`r one_auth_males` gendered male authors and `r one_auth_females` gendered female authors) (**Fig. 1**). There was only `r n_prolif_female` gendered female author with ≥ `r prolif_cutoff` total FLAs, while there were `r n_prolif_male` gendered male authors with `r prolif_cutoff` - `r max_auths` total FLAs each. Collectively, those `r n_prolif_male` gendered male authors accounted for `r auths_by_prolif_male[1,1]` (`r auths_by_prolif_male[1,2]`%) of all FLAs in the corpus (**Fig. 1**). Last authorships made up >65% of FLAs for `r last_auth_65` of the `r nrow(prolific_summary)` most productive authors (**Table S2**).
+
+<br>
+
 ##### *Intersections of gender, country income, and authorship position*
 
-A total of `r n_countries` countries were represented in authorship affiliations (high-income: `r income_table[1,2]`, upper-middle-income: `r income_table[4,2]`, lower-middle-income: `r income_table[3,2]`, low-income: `r income_table[2,2]`). Most authorships listed a primary affiliation with the `r country_tots[1,1]` (`r country_tots[1,3]`%), `r country_tots[2,1]` (`r country_tots[2,3]`%), `r country_tots[3,1]` (`r country_tots[3,3]`%), `r country_tots[4,1]` (`r country_tots[4,3]`%), or the `r country_tots[5,1]` (`r country_tots[5,3]`%) (**Fig. S2**), together comprising `r top5`% of all FLA. Within each of these five countries, there were more authorships by gendered male authors than authors of any other gender (**Fig. 2**). When countries were classified by income, `r econ_auth[1,3]`% of all FLA listed a high-income country affiliation, while other income groups were less well represented (upper middle: `r econ_auth[4,3]`%, lower-middle: `r econ_auth[3,3]`%, low: `r econ_auth[2,3]`%; **Fig. S3**). For high-income and lower-middle-income countries, there were slightly more last authorships than first authorships; the opposite pattern was observed for upper-middle-income and low-income countries (**Fig. S3**). Our gender classification process was least successful for authorships listing an affiliation with China (**Fig. 2**), with `r china_summary[3,4]` out of `r country_tots[4,2]` authorships classified as unknown gender. 
+A total of `r n_countries` countries (high-income: n = `r income_table[1,2]`, upper-middle-income: n = `r income_table[4,2]`, lower-middle-income: n = `r income_table[3,2]`, low-income: n = `r income_table[2,2]`) were represented in authorship affiliations (**Fig. S2**). Most authorships listed a primary affiliation with the `r country_tots[1,1]` (`r country_tots[1,3]`%), `r country_tots[2,1]` (`r country_tots[2,3]`%), `r country_tots[3,1]` (`r country_tots[3,3]`%), `r country_tots[4,1]` (`r country_tots[4,3]`%), or the `r country_tots[5,1]` (`r country_tots[5,3]`%) (**Fig. S2**), together comprising `r top5`% of all FLAs. Within each of these five countries, there were more authorships by gendered male authors than authors of any other gender (**Fig. S3**). Most FLAs had a high-income country affiliation (`r econ_auth[1,3]`%), while other income groups were less well represented (upper middle: `r econ_auth[4,3]`%, lower-middle: `r econ_auth[3,3]`%, low: `r econ_auth[2,3]`%; **Fig. S4**). 
 
 ```{r Intersections of gender, geography, and authorship, include = F}
 
@@ -266,7 +271,7 @@ last_male_H_perc <- round(gender_position_income_summary[15, 5], 1)
 
 ```
 
-For authors with a high-income country affiliation, there was an interaction between gender and authorship position (**Fig. 3**). There was a higher proportion of first authorships by gendered female authors (`r first_fem_H_perc`% of all FLA) compared to last authorships by gendered female authors (`r last_fem_H_perc`% of all FLA). In contrast, there was a higher proportion of last authorships by gendered male authors (`r last_male_H_perc`% of all FLA) compared to first authorships by gendered male authors (`r first_male_H_perc`% of all FLA). There were too few data for authorships listing an affiliation with an upper-middle-income country, a lower-middle-income country, or a low-income country to determine if differences by gender and authorship position were meaningful (**Fig. 3**).
+For authors with an HIC affiliation, there was an interplay between gender and author position (**Fig. 2**). Specifically, there were more first authorships than last authorships (`r first_fem_H_perc`% versus `r last_fem_H_perc`% of all FLAs) by gendered female authors, while there were more last than first authorships (`r last_male_H_perc`% versus `r first_male_H_perc`% of all FLAs) by gendered male authors. The data on authorships with an upper-middle-income, lower-middle-income, or low-income country affiliation were too limited to determine if differences by gender and author position were meaningful (**Fig. 2**).
 
 <br>
 
@@ -278,98 +283,70 @@ geo_focused_pubs <- publication_data_with_geo %>%
                 !grepl("US", cc_of_study, fixed = T)) %>% 
   mutate(year = lubridate::year(publication_date))
 
-nonspecific_pubs <- publication_data_with_geo %>% 
-  dplyr::filter(country_of_study == "Non-specific")
-
 n_geo_pubs <- geo_focused_pubs %>% 
   nrow()
 
-
-  
-  geo_perc <- round(n_geo_pubs/n_pub*100, 1)
-
-get_geo_align_summary <- function(geo_focused_pubs, time_period){
+geo_perc <- round(n_geo_pubs/n_pub*100, 1)
 
 
-first_geo_match_tbl <- table(geo_focused_pubs$first_geo_match)
-last_geo_match_tbl <- table(geo_focused_pubs$last_geo_match)
-either_geo_match_tbl <- table(geo_focused_pubs$either_geo_match)
+nonspecific_pubs <- publication_data_with_geo %>% 
+  dplyr::filter(country_of_study == "Non-specific")
 
-n_first_geo_match <- first_geo_match_tbl[2]
-n_last_geo_match <- last_geo_match_tbl[2]
-n_either_geo_match <- either_geo_match_tbl[2] + either_geo_match_tbl[3]
-n_both_geo_match <- either_geo_match_tbl[3]
+n_nonspecific_pubs <- nrow(nonspecific_pubs)
 
+US_geo <- publication_data_with_geo %>% 
+  dplyr::filter(grepl("US", cc_of_study, fixed = T))
 
-denom_first_geo_match <- sum(first_geo_match_tbl)
-denom_last_geo_match <- sum(last_geo_match_tbl)
-denom_either_geo_match <- sum(either_geo_match_tbl)
-denom_both_geo_match <-  sum(last_geo_match_tbl)
+n_US_geo <- nrow(US_geo)
 
-first_match_perc <- round(n_first_geo_match / sum(first_geo_match_tbl)*100, 1)
-last_match_perc <- round(n_last_geo_match / sum(last_geo_match_tbl)*100, 1)
-either_match_perc <- round(n_either_geo_match / sum(either_geo_match_tbl)*100, 1)
-# can only have both authors match when the paper had first and last authors
-# (ie don't count the single-authored papers in the denominator)
-both_match_perc <- round(n_both_geo_match / sum(last_geo_match_tbl)*100, 1)
-  
-  out <- data.frame(time_period =time_period, 
-             first_authorship_match = sprintf("%s/%s (%s%%)",n_first_geo_match,denom_first_geo_match, first_match_perc ),
-             last_authorship_match = sprintf("%s/%s (%s%%)",n_last_geo_match,denom_last_geo_match, last_match_perc),
-             either_match = sprintf("%s/%s (%s%%)",n_either_geo_match,denom_either_geo_match, either_match_perc),
-             both_match = sprintf("%s/%s (%s%%)",n_both_geo_match,denom_both_geo_match, both_match_perc)
-  )
-  
-  return(out)
-}
-
-
+# for making table S4
 align_all <- get_geo_align_summary(geo_focused_pubs, time_period = "2011-2022") 
 
 geo_focused_pubs_2016 <- geo_focused_pubs %>% 
   dplyr::filter(year <= 2016)
 
-align_2011_2016 <- get_geo_align_summary(geo_focused_pubs_2016, time_period = "2011-2016")
+align_2011_2016 <- get_geo_align_summary(geo_focused_pubs_2016, 
+                                         time_period = "2011-2016")
 
 geo_focused_pubs_2022 <- geo_focused_pubs %>% 
   dplyr::filter(year > 2016)
 
-align_2017_2022 <- get_geo_align_summary(geo_focused_pubs_2022, time_period = "2017-2022")
+align_2017_2022 <- get_geo_align_summary(geo_focused_pubs_2022, 
+                                         time_period = "2017-2022")
 
-table_s4 <- rbind(align_all,align_2011_2016,align_2017_2022)
+table_s4 <- rbind(align_all, align_2011_2016, align_2017_2022)
 
-
-geo_perc <- round(n_geo_pubs/n_pub*100, 1)
-
+# for the text
 first_geo_match_tbl <- table(geo_focused_pubs$first_geo_match)
 last_geo_match_tbl <- table(geo_focused_pubs$last_geo_match)
 either_geo_match_tbl <- table(geo_focused_pubs$either_geo_match)
+both_geo_match_tbl <- table(geo_focused_pubs$both_geo_match)
 
 n_first_geo_match <- first_geo_match_tbl[2]
 n_last_geo_match <- last_geo_match_tbl[2]
-n_either_geo_match <- either_geo_match_tbl[2] + either_geo_match_tbl[3]
-n_both_geo_match <- either_geo_match_tbl[3]
-
+n_either_geo_match <- either_geo_match_tbl[2]
+n_both_geo_match <- both_geo_match_tbl[2]
+ 
 first_match_perc <- round(n_first_geo_match / sum(first_geo_match_tbl)*100, 1)
 last_match_perc <- round(n_last_geo_match / sum(last_geo_match_tbl)*100, 1)
 either_match_perc <- round(n_either_geo_match / sum(either_geo_match_tbl)*100, 1)
-# can only have both authors match when the paper had first and last authors
-# (ie don't count the single-authored papers in the denominator)
-both_match_perc <- round(n_both_geo_match / sum(last_geo_match_tbl)*100, 1)
-
-
-geo_focused_pubs %>% 
+both_match_perc <- round(n_both_geo_match / sum(both_geo_match_tbl)*100, 1)
+ 
+geo_focused_pubs_2016 <- geo_focused_pubs %>% 
   dplyr::filter(year <= 2016)
+
+geo_focused_pubs_2022 <- geo_focused_pubs %>% 
+  dplyr::filter(year > 2016)
 
 ```
 
 ##### *Alignment of authorship geography and article geography*
 
-We found that `r n_geo_pubs` articles (`r geo_perc`% of all articles in the corpus) were geographically focused on one or more non-US countries (e.g. field or labwork was performed there, specialized knowledge of a country was required to perform the research). About two-thirds of the time (`r either_match_perc`%), either the first or last authorship geography matched the article geography. First authorship geography matched article geography `r first_match_perc`% of the time, whereas last authorship geography matched article geography `r last_match_perc`% of the time. Both first and last authorships matched the article geography `r both_match_perc`% of the time.
+We found that `r n_geo_pubs` articles (`r geo_perc`% of all articles in the corpus) were geographically focused on one or more non-US countries (e.g. field or labwork was performed there, specialized knowledge of a country was required to perform the research). About two-thirds of the time (`r either_match_perc`%), either the first or last authorship geography matched the article geography. First authorship geography matched article geography `r first_match_perc`% of the time, whereas last authorship geography matched article geography `r last_match_perc`% of the time. Both first and last authorships matched the article geography `r both_match_perc`% of the time. Though there were more articles published in the second half of the dataset (2011-2016: `r nrow(geo_focused_pubs_2016)` articles; 2017-2022: `r nrow(geo_focused_pubs_2022)` articles), the rates of authorship-geography matches stayed nearly constant over time (**Table S4**). There were `r n_nonspecific_pubs` articles (`r round((n_nonspecific_pubs/n_pub)*100, 1)`%) with a non-specific article geography and `r n_US_geo` articles (`r round((n_US_geo/n_pub)*100, 1)`%) with an article geography that included the United States.
 
 <br>
 
-##### *Network patterns in FLA*
+##### *Network patterns in FLAs*
 
 Articles and authors represent two components of a bipartite graphs. Authors are linked by co-authorship on an article. Because we are interested in the connections between people, we re-project the bipartite graph such that the graph contains weighted edges between authors based on their co-authorships. Using the author graph, we examine the relationship between gender and centrality. Here we focus on two measures of centrality: betweenness and mean harmonic centrality. 
 
@@ -458,7 +435,7 @@ Fig S4. Percent of all first and last authorships (n = 898) separated by country
 plot(income_position_plot)
 ```
 
-#### Table s1
+#### Table S1
 
 Table S1. Comparison of a pronouns-based approach and a name-based approach to classify author genders. See Gender classification of authors in the main text for details of how authors were classified using each approach.
 
@@ -468,20 +445,19 @@ comparison_table  |>
   kableExtra::kable()
 ```
 
-#### Table s2
+#### Table S2
 
 Table S2. Last authorships as a percentage of all first and last authorships (FLAs) for the most productive authors in the dataset (i.e. ≥ 10 FLAs).
 
 ```{r last auths as percent, echo=F}
 
-tar_load(prolific_summary)
 prolific_summary  |>
   kableExtra::kable() |>
   kableExtra::kable_material()
 ```
 
 
-#### Table s3
+#### Table S3
 
 Table S3. Model coefficients for a linear model to examine effects of authorship position, country income, and year on the percent of authorships by gendered female authors. The “Year” variable was centered around 2011 to improve coefficient interpretability. P values < 0.05 are bolded. 
 
@@ -492,7 +468,7 @@ summary(mod)
 
 ```
 
-#### Table s4
+#### Table S4
 
 Table S4. Matches between authorship geography (i.e. country affiliation) and article geography (i.e. the geographic focus of a study, excluding the United States). A “match” occurred when the authorship geography was the same as any of the countries contained in the article geography. Values are provided for the whole timespan of the data (2011-2022) as well as broken down into two time periods (2011-2016 and 2017-2022) to explore potential changes in authorship over time. Denominator sizes are sometimes different because not all articles had a last authorship (i.e. sole-authored articles, which were counted as first authorships).
 
@@ -504,7 +480,7 @@ table_s4 |>
 
 ```
 
-#### Table s5 
+#### Table S5 
 **Table S5.** A summary of two measures of network centrality (betweenness centrality and harmonic centrality) calculated for authors separated by gender. HDCI = high density confidence interval.
 
 <br>
