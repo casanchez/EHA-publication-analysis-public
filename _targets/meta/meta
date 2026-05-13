@@ -99,7 +99,7 @@ plot_authorship_two_panel|function|782cc1e18a8070f3
 plot_propfem_two_panel|function|801250f83b6d6894
 plot_propfem_over_time|function|515c545026c1194d
 drop_hp_auths|function|551b3b4ee5bd68d7
-.Random.seed|object|c79b2c8691a39e07
+.Random.seed|object|69d53d1ea9088297
 plot_propfem_position_over_time|function|cb62028f9a444ce3
 plot_model_preds|function|14c721e373995924
 get_geo_align_summary|function|b1ec7117db5ea88d
@@ -139,4 +139,4 @@ clean_authorship_data|function|1de7c48ae3e9f6fc
 get_primary_country|function|aba93ad9316d4d8f
 get_primary_affiliations|function|050676c04cac4095
 add_gender_to_auths_high_prod_filter|function|f075e96e41425058
-main_text|stem|9e3496d3c20b2ff6|927438f7461adbde|cbbba1cdec0bc569|-1710777693|reports/results.html*reports/results.Rmd|t20585.0220178167s|s1069013b|1069013|file|local|vector|||8.31||
+main_text|stem|1c61be56f214daa0|91be8058127a8f53|d58a205ed5283a64|-1710777693|reports/results.html*reports/results.Rmd|t20586.5967749526s|s1067716b|1067716|file|local|vector|||8.42||

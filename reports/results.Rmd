@@ -18,6 +18,7 @@ tar_load(auths_with_gender)
 tar_load(gender_country_summary)
 tar_load(gender_position_summary)
 tar_load(gender_position_income_summary)
+tar_load(income_data_clean)
 
 
 tar_load(gender_betweenness_table)
@@ -252,7 +253,7 @@ china_summary <- gender_country_summary %>%
 
 ##### *Gender composition of authors and authorships*
 
-After combining the results of our two gender classification approaches (see Text S2 and Table S1 for a comparison of the approaches), prioritizing gender inferred using pronouns in cases of dataset disagreement, we ultimately classified `r gender_by_final[2,2]` authors (`r gender_by_final[2,3]`%) as gendered male, `r gender_by_final[1,2]` (`r gender_by_final[1,3]`%) as gendered female, `r gender_by_final[3,2]` (`r gender_by_final[3,3]`%) as gendered nonbinary, and `r gender_by_final[4,2]` (`r gender_by_final[4,3]`%) as unknown gender. Of all FLAs, `r gender_auths_table[2,2]` (`r gender_auths_table[2,3]`%) were by gendered male authors, `r gender_auths_table[1,2]` (`r gender_auths_table[1,3]`%) were by gendered female authors, `r gender_auths_table[3,2]` (`r gender_auths_table[3,3]`%) was by a gendered nonbinary author, and `r gender_auths_table[4,2]` (`r gender_auths_table[4,3]`%) were by authors of unknown gender. Our gender classification process was least successful for authorships listing an affiliation with China, with `r china_summary[3,4]` out of `r country_tots[4,2]` authorships classified as unknown gender. Given that only one author was classified as gendered nonbinary, we included that author in figures (except where noted) but did not attempt to draw any conclusions about authorship patterns in regard to nonbinary authors.
+After combining the results of our two gender classification approaches (see **Text S2** and **Table S1** for a comparison of the approaches), prioritizing gender inferred using pronouns in cases of dataset disagreement, we ultimately classified `r gender_by_final[2,2]` authors (`r gender_by_final[2,3]`%) as gendered male, `r gender_by_final[1,2]` (`r gender_by_final[1,3]`%) as gendered female, `r gender_by_final[3,2]` (`r gender_by_final[3,3]`%) as gendered nonbinary, and `r gender_by_final[4,2]` (`r gender_by_final[4,3]`%) as unknown gender. Of all FLAs, `r gender_auths_table[2,2]` (`r gender_auths_table[2,3]`%) were by gendered male authors, `r gender_auths_table[1,2]` (`r gender_auths_table[1,3]`%) were by gendered female authors, `r gender_auths_table[3,2]` (`r gender_auths_table[3,3]`%) was by a gendered nonbinary author, and `r gender_auths_table[4,2]` (`r gender_auths_table[4,3]`%) were by authors of unknown gender. Our gender classification process was least successful for authorships listing an affiliation with China, with `r china_summary[3,4]` out of `r country_tots[4,2]` authorships classified as unknown gender. Given that only one author was classified as gendered nonbinary, we included that author in figures (except where noted) but did not attempt to draw any conclusions about authorship patterns in regard to nonbinary authors.
 
 For both the first and last author positions, there were more authorships by gendered male authors than by gendered female authors (first-male: `r perc_all[2,4]`% of all FLAs, first-female: `r perc_all[1,4]`%, last-male: `r perc_all[6,4]`%, last-female: `r perc_all[5,4]`%; **Fig. S1**). Nearly three-quarters of all authors (`r one_auth_all`%) had one authorship each (`r one_auth_males` gendered male authors and `r one_auth_females` gendered female authors) (**Fig. 1**). There was only `r n_prolif_female` gendered female author with ≥ `r prolif_cutoff` total FLAs, while there were `r n_prolif_male` gendered male authors with `r prolif_cutoff` - `r max_auths` total FLAs each. Collectively, those `r n_prolif_male` gendered male authors accounted for `r auths_by_prolif_male[1,1]` (`r auths_by_prolif_male[1,2]`%) of all FLAs in the corpus (**Fig. 1**). Last authorships made up >65% of FLAs for `r last_auth_65` of the `r nrow(prolific_summary)` most productive authors (**Table S2**).
 
@@ -338,6 +339,33 @@ geo_focused_pubs_2016 <- geo_focused_pubs %>%
 geo_focused_pubs_2022 <- geo_focused_pubs %>% 
   dplyr::filter(year > 2016)
 
+
+# when the first author geography does not "match" article geography,
+# what country is the first author affiliated with?
+first_auth_not_local <- geo_focused_pubs %>% 
+  dplyr::select(cc_of_study, first_auth_cc, first_geo_match) %>% 
+  dplyr::filter(first_geo_match == "no") %>% 
+  dplyr::mutate(first_auth_iso3 = countrycode::countrycode(
+    first_auth_cc, "iso2c", "iso3c")) %>% 
+  # group_by(income_majority) %>% 
+  group_by(first_auth_iso3) %>% 
+  dplyr::summarise(n = n()) %>% 
+  left_join(income_data_clean[, c("iso3", "income_majority")], 
+            by = c("first_auth_iso3" = "iso3")) %>% 
+  arrange(desc(n))
+
+last_auth_not_local <- geo_focused_pubs %>% 
+  dplyr::select(cc_of_study, last_auth_cc, last_geo_match) %>% 
+  dplyr::filter(last_geo_match == "no") %>% 
+  dplyr::mutate(last_auth_iso3 = countrycode::countrycode(
+    last_auth_cc, "iso2c", "iso3c")) %>% 
+  # group_by(income_majority) %>% 
+  group_by(last_auth_iso3) %>% 
+  dplyr::summarise(n = n()) %>% 
+  left_join(income_data_clean[, c("iso3", "income_majority")], 
+            by = c("last_auth_iso3" = "iso3")) %>% 
+  arrange(desc(n))
+
 ```
 
 ##### *Alignment of authorship geography and article geography*
@@ -346,19 +374,15 @@ We found that `r n_geo_pubs` articles (`r geo_perc`% of all articles in the corp
 
 <br>
 
-##### *Network patterns in FLAs*
+##### *Characteristics of the author network*
 
-Articles and authors represent two components of a bipartite graphs. Authors are linked by co-authorship on an article. Because we are interested in the connections between people, we re-project the bipartite graph such that the graph contains weighted edges between authors based on their co-authorships. Using the author graph, we examine the relationship between gender and centrality. Here we focus on two measures of centrality: betweenness and mean harmonic centrality. 
-
-Betweenness measures the number of shortest paths a node resides on. The shortest path is the walk between two nodes that requires traversing the least number of edges. A node with high betweenness is structurally important to the graph. In our analysis, authors are nodes, and authors with high betweenness likely represent people in positions of "power" - PI, resource control, etc -  within the network.
-
-Harmonic mean centrality measures the degree of a node and its neighbors up to certain distance. The higher the degree of a node and its neighbors, the higher the harmonic mean centrality -- with the important caveat that the influence of neighbors decays with distance. This tells us about how well connected nodes and their neighbors are to the rest of the graph. Here, an author with high harmonic centrality is collaborating with many people who are also collaborating with many people.
+See `_network_analysis_targets.R` file and **Table S5** for results reported in this section.
 
 <br>
 
 
 #### Figure 1
-Fig 1. Total first and last authorships associated with unique authors. Gendered female (n = 186) and gendered male (n = 297) authors are displayed in the top and bottom panels respectively. Authors classified as nonbinary (n = 1) or unknown (n = 14) are not displayed. Note that the y-axis is on a square-root scale.
+Fig 1. Total first and last authorships associated with unique authors. Gendered female (n = 186) and gendered male (n = 297) authors are displayed in the top and bottom panels respectively. Authors classified as gendered nonbinary (n = 1) or unknown gender (n = 14) are not displayed. Note that the y-axis is on a square-root scale.
 
 ```{r fig1, echo=F, fig.height = 6, fig.width = 6}
 plot(authorships_histogram)
