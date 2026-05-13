@@ -29,7 +29,8 @@ prep_model_dat <- function(auths_with_gender){
              .drop = F) %>% 
     summarise(n = n()) %>% 
     # join to get the denominator data
-    left_join(tots) %>% 
+    left_join(tots, by = join_by(year, authorship_position,
+                                 income_majority)) %>% 
     filter(gender_final == "gendered female") %>% 
     mutate(perc_female = n/tot_authorships*100) %>% 
     # just to have prettier plotting
