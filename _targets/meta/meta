@@ -16,7 +16,6 @@ publication_data|stem|741feab37efc0b52|06cf74dc84edd2c5|4633161dbefb7452|1642092
 authorship_data|stem|bad32893228c5c10|c1b7be956d5b17e6|ac5239bda3e27ed8|-1896183085||t20584.6591109135s|s79684b|79684|rds|local|vector|||0.09||
 auths_with_gender|stem|16aaba649e500119|66469a8f750e084b|9f0f64a2dc630aac|1518802090||t20584.6604933213s|s84635b|84635|rds|local|vector|||0.06||
 authorships_contributor_gender_summary|stem|693c7c081205deaa|83f2a1668156626d|bf576621c29eb7a7|-976277497||t20584.6604946402s|s12424b|12424|rds|local|vector|||0.03||
-pubs_with_focal_country|stem|e2e431601d06b2c5|c36209b50314d166|a5555642a9ba8ccb|-1762661400||t20584.6605198237s|s60002b|60002|rds|local|vector|||2.09||
 prolific_summary|stem|f96090e4e0158fa2|e66a694aa4f03e03|7761e08e487faf7a|-986268128||t20584.6605221873s|s813b|813|rds|local|vector|||0.16||
 gender_income_time_summary|stem|4dfcb0d139ad6b6d|7aac1b860adfd447|89bb2401da3b5223|-219765610||t20584.6605229688s|s1063b|1063|rds|local|vector|||0.05||
 glm_dat|stem|1306934ecbba3681|1f2013d105097e45|5bb98bd7b00a4e13|-1039767668||t20584.6605238205s|s11570b|11570|rds|local|vector|||0.04||
@@ -82,7 +81,10 @@ propfem_two_panel|stem|c71c104522fc4366|5d7d68c12df40ab6|57a409024e5699ba|403872
 Fig3_tif|stem|4e2447e840ff4239|7023811505e6ca69|7d611509341e52b6|1540218023||t20584.6918632753s|s70b|70|rds|local|vector|||0.35||
 gender_position_plot|stem|16513ec327e046e0|6850dcf8d4b473be|c045e5bcc5620ced|-1192363467||t20584.7082444398s|s139285b|139285|rds|local|vector|||0.06||
 FigS1_tif|stem|558d52a793e7c5ad|6607c4e871fff12f|5bc97f5b139050dd|2797228||t20584.7082507919s|s71b|71|rds|local|vector|||0.47||
-compare_geography|function|84a3177078f4e37b
+income_position_plot|stem|d5adde66acfef39b|9f155b2d2b888cbe|42665ff2a63b8be2|2020458469||t20584.7099171925s|s125942b|125942|rds|local|vector|||0.08||
+FigS4_tif|stem|81233aecf0b8b8ed|9e54d0d4e240ec86|05d7a5a81d3a74c8|1646664428||t20584.709925064s|s71b|71|rds|local|vector|||0.59||
+pubs_with_focal_country|stem|a96a662ab1f23a36|c36209b50314d166|6f6ebaa0deb88256|-1762661400||t20584.7649797495s|s60987b|60987|rds|local|vector|||1.72||
+compare_geography|function|5c5b44d686c0d334
 examine_prolific|function|39de2537c0ba8672
 summarize_gender_by_position|function|55e9dc64b6cb9bcb
 compare_distributions|function|3e4b2ddf8c3aa85f
@@ -97,9 +99,10 @@ plot_authorship_two_panel|function|782cc1e18a8070f3
 plot_propfem_two_panel|function|801250f83b6d6894
 plot_propfem_over_time|function|515c545026c1194d
 drop_hp_auths|function|551b3b4ee5bd68d7
-.Random.seed|object|74431f47780c46b3
+.Random.seed|object|69d53d1ea9088297
 plot_propfem_position_over_time|function|cb62028f9a444ce3
 plot_model_preds|function|14c721e373995924
+get_geo_align_summary|function|b1ec7117db5ea88d
 plot_gender_position_income|function|db88c3fde0bb8f2c
 summarize_leadership_gender|function|05dc35ff79a615d5
 summarize_income_by_position|function|d5f1096294d2e94d
@@ -136,6 +139,4 @@ clean_authorship_data|function|1de7c48ae3e9f6fc
 get_primary_country|function|aba93ad9316d4d8f
 get_primary_affiliations|function|050676c04cac4095
 add_gender_to_auths_high_prod_filter|function|f075e96e41425058
-income_position_plot|stem|d5adde66acfef39b|9f155b2d2b888cbe|42665ff2a63b8be2|2020458469||t20584.7099171925s|s125942b|125942|rds|local|vector|||0.08||
-FigS4_tif|stem|81233aecf0b8b8ed|9e54d0d4e240ec86|05d7a5a81d3a74c8|1646664428||t20584.709925064s|s71b|71|rds|local|vector|||0.59||
-main_text|stem|87f574b61a15287f|1de4512082e66009|cdd3fd781e14aba9|-1710777693|reports/main_text.html*reports/main_text.Rmd|t20584.7100156665s|s1069442b|1069442|file|local|vector|||7.74||
+main_text|stem|1c61be56f214daa0|91be8058127a8f53|d58a205ed5283a64|-1710777693|reports/results.html*reports/results.Rmd|t20586.5967749526s|s1067716b|1067716|file|local|vector|||8.42||

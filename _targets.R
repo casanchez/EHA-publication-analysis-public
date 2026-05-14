@@ -287,7 +287,7 @@ plotting_targets <- tar_plan(
 report_targets <- tar_plan(
 
   tar_render(
-    main_text, path = "reports/main_text.Rmd",
+    main_text, path = "reports/results.Rmd",
     output_dir = "reports", knit_root_dir = here::here()
   )
 )
