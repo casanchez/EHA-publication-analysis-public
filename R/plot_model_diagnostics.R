@@ -7,10 +7,12 @@
 #' @return
 #' @author collinschwantes
 #' @export
-plot_model_diagnostics <- function(mod, dp_file = "figures/diagnostic_plots.png") {
+plot_model_diagnostics <- function(mod, 
+                                   dp_file = "figures/FigS1.tiff") {
 
   # Define the output file
-  png(dp_file, width = 800, height = 800)
+  tiff(dp_file, width = 6, height = 6, units = "in", res = 600, 
+       compression = "lzw")
   
   # Set layout and plot
   par(mfrow = c(2, 2))

@@ -2,30 +2,31 @@ network_targets <- tarchetypes::tar_plan(
   
   # get author and contributor data ####
   # reduce contributor data 
-  tar_target(contrib_reduced, contributor_data %>% 
+  tar_target(contrib_reduced, 
+             contributor_data %>% 
                dplyr::select(contributor_id,
                              gender_final,
                              nqg_classification,
                              institution_display_name,
                              institution_country_code) %>% 
                dplyr::mutate(contributor_id = as.character(contributor_id))
-  ),
+             ),
   
   # get primary affiliations
-  tar_target(primary_affiliation, get_primary_affiliations(contrib_reduced),
-             ),
+  tar_target(primary_affiliation, get_primary_affiliations(contrib_reduced)),
+  
   tar_target(df_contrib, get_primary_country(primary_affiliation)),
   
   # reduce authorship dataframe
-  tar_target(df_auth, auths_with_gender %>% 
+  tar_target(df_auth, 
+             auths_with_gender %>% 
                dplyr::select(all_of(c("contributor_id", "publication"))) %>% 
                dplyr::mutate(contributor_id = as.character(contributor_id)) %>% 
                dplyr::filter(!is.na(contributor_id))
-  ),
+             ),
   
   # make graph object ####
-  tar_target(g_contrib_gender, make_graph_object(df_auth,df_contrib)
-             ),
+  tar_target(g_contrib_gender, make_graph_object(df_auth,df_contrib)),
   
   # basic graph attributes ####
   
@@ -42,15 +43,15 @@ network_targets <- tarchetypes::tar_plan(
   
   # 87/498  contributors are publishing first or last author papers with 2 or more other contributors"
   
-  ### How centralized is the graph based on a measure of degree - range 0-1 where
-  ## 0 is maximally decentralized 1 is fully centralized
+  ### How centralized is the graph based on a measure of degree - range 0-1,
+  ## where 0 is maximally decentralized and 1 is fully centralized
   tar_target(degree_centrality,
              igraph::centr_degree(g_contrib_gender)
              ),
   
-  # 0.065 is highly decentralized based on degree measures of centrality"
+  # "0.065 is highly decentralized based on degree measures of centrality"
   
-  btw_centrality =  igraph::centr_betw(g_contrib_gender,directed = FALSE),
+  btw_centrality =  igraph::centr_betw(g_contrib_gender, directed = FALSE),
   
   # "0.084 is a highly decentralized graph based on betweenness 
   # (how many nodes lie on shortest paths) measures of centrality"
@@ -206,7 +207,3 @@ network_targets <- tarchetypes::tar_plan(
   
   
 )
-
-
-
-
