@@ -17,11 +17,11 @@ data_input_targets <- tar_plan(
   # de-identified data were created using scripts/deidentify_data.R 
   
   ## can download all data files from zenodo directly
-  # https://zenodo.org/api/records/15226626/files-archive
-  tar_file(contributors_csv, "data/deidentified_contributors.csv"),
-  tar_file(authorship_csv, "data/deidentified_authorship.csv"),
-  tar_file(publications_csv, "data/deidentified_publications.csv"),
-  tar_file(income_data_xlsx, "data/OGHIST.xlsx"),
+  # https://zenodo.org/api/records/20671970/files-archive
+  tar_file(contributors_csv, "data/20671970/deidentified_contributors.csv"),
+  tar_file(authorship_csv, "data/20671970/deidentified_authorship.csv"),
+  tar_file(publications_csv, "data/20671970/deidentified_publications.csv"),
+  tar_file(income_data_xlsx, "data/20671970/OGHIST.xlsx"),
   
   contributor_data_raw = readr::read_csv(contributors_csv),
   authorship_data_raw = readr::read_csv(authorship_csv),
