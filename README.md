@@ -19,8 +19,8 @@ environments and installing python libraries as well.
 
 This repo uses [targets](https://books.ropensci.org/targets/) to
 orchestrate the analysis pipeline. To recreate the results and figures
-used in the paper, run `targets::tar_make(main_text)`. This will render
-the rmarkdown notebook found at `reports/main_text.Rmd`. The actual
+used in the paper, run `targets::tar_make(results)`. This will render
+the rmarkdown notebook found at `reports/results.Rmd`. The actual
 pipeline is contained in `_targets.R` and `_network_analysis_targets.R`.
 
 - Please note that items in the rmd may not reflect the plos submission
@@ -28,7 +28,7 @@ pipeline is contained in `_targets.R` and `_network_analysis_targets.R`.
 
 Data used for analysis can be found in the following zenodo deposit:
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15226626.svg)](https://doi.org/10.5281/zenodo.15226626)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15226625.svg)](https://doi.org/10.5281/zenodo.15226625)
 
 Repo structure overview:
 
